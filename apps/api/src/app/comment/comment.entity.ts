@@ -17,7 +17,7 @@ export class Comment implements IComment {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @ManyToOne(() => User, (u) => u.comments)
+  @ManyToOne(() => User, (u) => u.comments, { onDelete: "CASCADE", lazy: true })
   owner: User;
 
   @Column()

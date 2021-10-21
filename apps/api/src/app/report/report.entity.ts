@@ -17,7 +17,7 @@ export class Report implements IReport {
   content: string;
 
   @ManyToOne(() => User, (u) => u.my_reports)
-  owner: User;
+  owner: Promise<User>;
 
   @Column(() => Metadata)
   metadata: Metadata;

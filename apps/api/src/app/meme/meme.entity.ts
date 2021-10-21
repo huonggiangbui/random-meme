@@ -18,14 +18,14 @@ export class Meme implements IMeme {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @ManyToOne(() => User, (u) => u.memes)
+  @ManyToOne(() => User, (u) => u.memes, { onDelete: "CASCADE", lazy: true })
   owner: User;
 
-  @Column('jsonb')
-  source: string | File;
+  @Column('jsonb', { unique: true })
+  source!: string | File;
 
-  @Column()
-  content: string;
+  @Column({ nullable: true })
+  content?: string;
 
   @Column({ default: 0 })
   upvotes: number;
@@ -33,9 +33,13 @@ export class Meme implements IMeme {
   @Column({ default: 0 })
   downvotes: number;
 
-  @OneToMany(() => Comment, (c) => c.meme)
+  @Column("text", { nullable: true, array: true })
+  categories?: string[];
+
+  @OneToMany(() => Comment, (c) => c.meme, { lazy: true })
   comments: Comment[];
 
+  // TODO: Fix relation
   @ManyToMany(() => Report)
   @JoinTable()
   reported: Report[];

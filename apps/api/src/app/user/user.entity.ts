@@ -6,6 +6,7 @@ import {
   JoinTable,
   OneToMany,
 } from 'typeorm';
+import { IsEmail } from 'class-validator';
 import { User as IUser } from '@random-meme/shared-types';
 import { Report } from '../report/report.entity';
 import { Meme } from '../meme/meme.entity';
@@ -16,24 +17,26 @@ export class User implements IUser {
   @Column()
   name: string;
 
-  @PrimaryColumn()
+  @PrimaryColumn({ unique: true })
+  @IsEmail()
   email: string;
 
   @Column()
-  password: string;
+  password!: string;
 
   @Column('jsonb', { nullable: true })
-  avatar?: File;
+  avatarUrl?: string;
 
-  @OneToMany(() => Meme, (m) => m.owner)
+  @OneToMany(() => Meme, (m) => m.owner, { onDelete: "RESTRICT", lazy: true })
   memes: Meme[];
 
   @OneToMany(() => Comment, (c) => c.owner)
-  comments: Comment[];
+  comments: Promise<Comment[]>;
 
   @OneToMany(() => Report, (r) => r.owner)
-  my_reports: Report[];
+  my_reports: Promise<Report[]>;
 
+  //TODO: Fix relation
   @ManyToMany(() => Report)
   @JoinTable()
   reported: Report[];
