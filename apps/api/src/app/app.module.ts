@@ -15,6 +15,7 @@ import { UserController } from './user/user.controller';
     ConfigModule.forRoot({
       load: [configuration],
       envFilePath: '.env',
+      isGlobal: true
     }),
     UserModule,
     CommentModule,

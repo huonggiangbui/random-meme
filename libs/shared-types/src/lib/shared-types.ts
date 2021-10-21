@@ -6,17 +6,18 @@ export type Metadata = {
 export interface User {
   name: string;
   email: string;
-  avatar?: File;
+  avatarUrl?: string;
   memes: Meme[];
 }
 
 export interface Meme {
   owner: User;
   source: string | File;
-  content: string;
+  content?: string;
 
   upvotes: number;
   downvotes: number;
+  categories?: string[];
   comments: Comment[];
   reported: Report[];
   metadata: Metadata

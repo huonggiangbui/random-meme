@@ -10,9 +10,11 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Connection,
+  createQueryBuilder,
   FindManyOptions,
   FindOneOptions,
   Repository,
+  UpdateResult,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Cache } from 'cache-manager';
@@ -20,7 +22,6 @@ import { User } from './user.entity';
 import { v4 } from 'uuid';
 import { Tokens } from '../types/Tokens';
 import { CreateUserDto } from './dto/create-user';
-import { options } from 'joi';
 
 export interface IPayload {
   email: string;
@@ -35,17 +36,26 @@ export class UserService {
     private readonly jwtService: JwtService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
-  async create(data: CreateUserDto): Promise<User> {
+  async create(data: CreateUserDto): Promise<Omit<User, "password" | "refresh_tokens">> {
     const newUser = this.userRepository.create(data);
     const hashedPassword = await bcrypt.hash(data.password, 10);
     newUser.password = hashedPassword;
-    await this.userRepository.save(newUser);
+    const { password, refresh_tokens, ...rest } = await this.userRepository.save(newUser);
 
-    return newUser;
+    return rest;
   }
 
   findAll(options?: FindManyOptions<User>): Promise<User[]> {
     return this.userRepository.find(options);
+  }
+
+  async getProfile(email: string): Promise<Omit<User, "password" | "refresh_tokens">>{
+    const { password, refresh_tokens, ...rest } = await createQueryBuilder(User)
+      .leftJoinAndSelect("User.memes", "Meme")
+      .where("User.email = :email", { email: email })
+      .getOne() as User;
+
+    return rest;
   }
 
   async findByEmail(
@@ -53,20 +63,27 @@ export class UserService {
     options?: FindOneOptions<User>
   ): Promise<User> {
     try {
-      const user = await this.userRepository.findOneOrFail(
+      return this.userRepository.findOneOrFail(
         { email },
         options
       );
-      return user;
     } catch (err) {
       Logger.error(err);
       throw new Error('Cannot find user with email: ' + email);
     }
   }
 
-  async remove(id: string): Promise<void> {
-    await this.userRepository.delete(id);
+  async update(user: User, data: Partial<Pick<User, "name" | "avatarUrl" | "password">>): Promise<UpdateResult>{
+    if (data.password) {
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+      data.password = hashedPassword;
+    }
+    return this.userRepository.update(user.email, data);
   }
+
+  // async remove(id: string): Promise<void> {
+  //   await this.userRepository.delete(id);
+  // }
 
   async signinWithCredentials(
     email: string,
