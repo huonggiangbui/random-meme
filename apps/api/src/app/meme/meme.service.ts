@@ -11,6 +11,7 @@ import {
   FindManyOptions,
   FindOneOptions,
   Repository,
+  UpdateResult,
 } from 'typeorm';
 import { Meme } from './meme.entity';
 import { CreateMemeDto } from './dto/create-meme';
@@ -52,7 +53,7 @@ export class MemeService {
       const meme = memes[i];
       const result = await this.findBySource(JSON.stringify(meme.source))
       if (!result) {
-        await this.create(admin, meme)
+        await this.create(admin as User, meme)
       }
     }
   }
@@ -110,18 +111,20 @@ export class MemeService {
     }
   }
 
-  // async update(user: User, data: Partial<Pick<User, "name" | "avatarUrl" | "password">>): Promise<UpdateResult> {
-  //   if (data.password) {
-  //     const hashedPassword = await bcrypt.hash(data.password, 10);
-  //     data.password = hashedPassword;
-  //   }
-  //   return this.userRepository.update(user.email, data);
-  // }
+  async update(user: User, data: Partial<Pick<Meme, 'id' | "content">>): Promise<UpdateResult> {
+    try {
+      if (await this.validate(user, data.id)) {
+        return this.memeRepository.update(data.id, data);
+      }
+    } catch (err) {
+      Logger.error(err);
+      throw new Error('Cannot update meme with id: ' + data.id);
+    }
+  }
 
   async remove(user: User, id: string): Promise<void> {
     try {
-      const meme = await this.findById(id);
-      if (meme && (await meme.owner).email == user.email) {
+      if (await this.validate(user, id)) {
         await this.memeRepository.delete(id);
       }
     } catch (err) {
@@ -130,12 +133,9 @@ export class MemeService {
     }
   }
 
-  // async validate(email: string, pass: string): Promise<User> {
-  //   const user = await this.findByEmail(email);
-  //   if (user && (await bcrypt.compare(pass, user.password))) {
-  //     return user;
-  //   }
-
-  //   throw new UnauthorizedException();
-  // }
+  async validate(user: User, id: string): Promise<boolean> {
+    const meme = await this.memeRepository.findOneOrFail(id);
+    const owner = await meme.owner
+    return owner.email == user.email;
+  }
 }

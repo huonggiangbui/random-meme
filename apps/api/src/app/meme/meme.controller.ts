@@ -3,6 +3,7 @@ import { JwtAuthGuard } from '../user/guards/jwt-auth.guard';
 import { TheUser } from '../user/user.decorator';
 import { User } from '../user/user.entity';
 import { CreateMemeDto } from './dto/create-meme';
+import { UpdateMemeDto } from './dto/update-meme';
 import { Meme } from './meme.entity';
 import { MemeService } from './meme.service';
 
@@ -28,17 +29,17 @@ export class MemeController {
 
   @UseGuards(JwtAuthGuard)
   @Delete("memes/:id")
-  async deleteMeme(@TheUser() user: User, @Param() params): Promise<void> {
-    return this.memeService.remove(user, params.id)
+  async deleteMeme(@TheUser() user: User, @Param('id') id: string): Promise<void> {
+    return this.memeService.remove(user, id)
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Put("user")
-  // async updateProfile(@TheUser() user: User, @Body() data: UpdateUserDto) {
-  //   const payload: Partial<
-  //     Pick<User, "name" | "avatarUrl">
-  //   > & { avatar?: any } = { ...data };
+  @UseGuards(JwtAuthGuard)
+  @Put("meme")
+  async updateMeme(@TheUser() user: User, @Body() data: UpdateMemeDto) {
+    const payload: Partial<
+      Pick<Meme, "id" | "content">
+    > = { ...data };
 
-  //   return this.userService.update(user, payload)
-  // }
+    return this.memeService.update(user, payload)
+  }
 }
