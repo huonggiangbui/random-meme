@@ -112,14 +112,14 @@ export class MemeService {
     }
   }
 
-  async update(user: User, data: Partial<Pick<Meme, 'id' | "content">>): Promise<UpdateResult> {
+  async update(user: User, content: string, id: string): Promise<UpdateResult> {
     try {
-      if (await this.validate(user, data.id)) {
-        return this.memeRepository.update(data.id, data);
+      if (await this.validate(user, id)) {
+        return this.memeRepository.update(id, { content });
       }
     } catch (err) {
       Logger.error(err);
-      throw new Error('Cannot update meme with id: ' + data.id);
+      throw new Error('Cannot update meme with id: ' + id);
     }
   }
 

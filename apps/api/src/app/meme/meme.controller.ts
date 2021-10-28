@@ -3,7 +3,6 @@ import { JwtAuthGuard } from '../user/guards/jwt-auth.guard';
 import { TheUser } from '../user/user.decorator';
 import { User } from '../user/user.entity';
 import { CreateMemeDto } from './dto/create-meme';
-import { UpdateMemeDto } from './dto/update-meme';
 import { Meme } from './meme.entity';
 import { MemeService } from './meme.service';
 
@@ -34,12 +33,8 @@ export class MemeController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put("meme")
-  async updateMeme(@TheUser() user: User, @Body() data: UpdateMemeDto) {
-    const payload: Partial<
-      Pick<Meme, "id" | "content">
-    > = { ...data };
-
-    return this.memeService.update(user, payload)
+  @Put("memes/:id")
+  async updateMeme(@TheUser() user: User, @Body() body: { content: string }, @Param('id') id: string) {
+    return this.memeService.update(user, body.content, id)
   }
 }
