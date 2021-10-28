@@ -36,7 +36,6 @@ export class User implements IUser {
   @OneToMany(() => Report, (r) => r.owner)
   my_reports: Promise<Report[]>;
 
-  //TODO: Fix relation
   @ManyToMany(() => Report)
   @JoinTable()
   reported: Report[];

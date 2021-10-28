@@ -36,10 +36,9 @@ export class Meme implements IMeme {
   @Column("text", { nullable: true, array: true })
   categories?: string[];
 
-  @OneToMany(() => Comment, (c) => c.meme, { lazy: true })
+  @OneToMany(() => Comment, (c) => c.meme, { onDelete: "CASCADE", lazy: true })
   comments: Comment[];
 
-  // TODO: Fix relation
   @ManyToMany(() => Report)
   @JoinTable()
   reported: Report[];

@@ -100,10 +100,11 @@ export class MemeService {
     try {
       const meme = await createQueryBuilder(Meme)
         .leftJoinAndSelect("Meme.owner", "User")
-        .select(['Meme', 'User.name', 'User.avatarUrl'])
+        .leftJoinAndSelect("Meme.comments", "Comment")
+        .select(['Meme', 'Comment', 'User.name', 'User.avatarUrl'])
         .where("Meme.id = :id", { id: id })
         .getOneOrFail() as Meme;
-
+     
       return meme;
     } catch (err) {
       Logger.error(err);
