@@ -39,7 +39,7 @@ export class Meme implements IMeme {
   @OneToMany(() => Comment, (c) => c.meme, { onDelete: "CASCADE", lazy: true })
   comments: Comment[];
 
-  @ManyToMany(() => Report)
+  @ManyToMany(() => Report, { onDelete: "CASCADE", lazy: true })
   @JoinTable()
   reported: Report[];
 

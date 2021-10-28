@@ -26,7 +26,7 @@ export class Comment implements IComment {
   @ManyToOne(() => Meme, (m) => m.comments)
   meme: Meme;
 
-  @ManyToMany(() => Report)
+  @ManyToMany(() => Report, { onDelete: "CASCADE", lazy: true })
   @JoinTable()
   reported: Report[];
 

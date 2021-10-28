@@ -11,19 +11,19 @@ export class CommentController {
 
   @UseGuards(JwtAuthGuard)
   @Post("comments/meme/:id")
-  async createMeme(@TheUser() user: User, @Body() body: { content: string }, @Param('id') id: string): Promise<void | Comment> {
+  async createComment(@TheUser() user: User, @Body() body: { content: string }, @Param('id') id: string): Promise<void | Comment> {
     return this.commentService.create(user, body.content, id)
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete("comments/:id")
-  async deleteMeme(@TheUser() user: User, @Param('id') id: string): Promise<void> {
+  async deleteComment(@TheUser() user: User, @Param('id') id: string): Promise<void> {
     return this.commentService.remove(user, id)
   }
 
   @UseGuards(JwtAuthGuard)
   @Put("comments/:id")
-  async updateMeme(@TheUser() user: User, @Body() body: { content: string }, @Param('id') id: string) {
+  async updateComment(@TheUser() user: User, @Body() body: { content: string }, @Param('id') id: string) {
     return this.commentService.update(user, body.content, id)
   }
 }

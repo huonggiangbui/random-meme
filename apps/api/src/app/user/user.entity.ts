@@ -36,7 +36,7 @@ export class User implements IUser {
   @OneToMany(() => Report, (r) => r.owner)
   my_reports: Promise<Report[]>;
 
-  @ManyToMany(() => Report)
+  @ManyToMany(() => Report, { onDelete: "CASCADE", lazy: true })
   @JoinTable()
   reported: Report[];
 
