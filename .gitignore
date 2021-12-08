@@ -39,3 +39,5 @@ testem.log
 Thumbs.db
 /apps/api/src/.env
 apps/api/.env
+/apps/api/src/app/config/service-account.json
+/apps/api/src/app/utils/admin.ts

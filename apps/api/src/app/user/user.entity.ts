@@ -25,7 +25,7 @@ export class User implements IUser {
   password!: string;
 
   @Column('jsonb', { nullable: true })
-  avatarUrl?: string;
+  avatar?: string;
 
   @OneToMany(() => Meme, (m) => m.owner, { onDelete: "RESTRICT", lazy: true })
   memes: Meme[];

@@ -68,7 +68,7 @@ export class MemeService {
       
       const memes = await createQueryBuilder(Meme)
         .leftJoinAndSelect("Meme.owner", "User")
-        .select(['Meme', 'User.name', 'User.avatarUrl'])
+        .select(['Meme', 'User.name', 'User.avatar'])
         .getMany() as Meme[];
 
       return memes;
@@ -101,7 +101,7 @@ export class MemeService {
       const meme = await createQueryBuilder(Meme)
         .leftJoinAndSelect("Meme.owner", "User")
         .leftJoinAndSelect("Meme.comments", "Comment")
-        .select(['Meme', 'Comment', 'User.name', 'User.avatarUrl'])
+        .select(['Meme', 'Comment', 'User.name', 'User.avatar'])
         .where("Meme.id = :id", { id: id })
         .getOneOrFail() as Meme;
      

@@ -63,7 +63,7 @@ export class CommentService {
   //   try {
   //     const meme = await createQueryBuilder(Meme)
   //       .leftJoinAndSelect("Meme.owner", "User")
-  //       .select(['Meme', 'User.name', 'User.avatarUrl'])
+  //       .select(['Meme', 'User.name', 'User.avatar'])
   //       .where("Meme.id = :id", { id: id })
   //       .getOneOrFail() as Meme;
 

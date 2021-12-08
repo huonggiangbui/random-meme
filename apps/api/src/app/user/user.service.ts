@@ -22,6 +22,7 @@ import { User } from './user.entity';
 import { v4 } from 'uuid';
 import { Tokens } from '../types/Tokens';
 import { CreateUserDto } from './dto/create-user';
+import StorageService from '../storage/storage.service';
 
 export interface IPayload {
   email: string;
@@ -34,6 +35,7 @@ export class UserService {
     private userRepository: Repository<User>,
     private readonly connection: Connection,
     private readonly jwtService: JwtService,
+    private storageService: StorageService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
   async create(data: CreateUserDto): Promise<Omit<User, "password" | "refresh_tokens">> {
@@ -73,17 +75,52 @@ export class UserService {
     }
   }
 
-  async update(user: User, data: Partial<Pick<User, "name" | "avatarUrl" | "password">>): Promise<UpdateResult>{
+  async update(user: User, data: Partial<
+    Pick<User, "name" | "password">
+  >, avatar: Express.Multer.File): Promise<UpdateResult | void>{
     if (data.password) {
       const hashedPassword = await bcrypt.hash(data.password, 10);
       data.password = hashedPassword;
     }
+    
+    if (avatar) {
+      if (user.avatar) {
+        await this.deletePhoto(user)
+      }
+      await this.updatePhoto(user, avatar);
+    }
+
     return this.userRepository.update(user.email, data);
   }
 
-  // async remove(id: string): Promise<void> {
-  //   await this.userRepository.delete(id);
-  // }
+  async remove(user: User): Promise<void> {
+    await this.deletePhoto(user);
+    await this.userRepository.delete(user.email);
+  }
+
+  async updatePhoto(
+    self: User,
+    file: Express.Multer.File
+  ): Promise<string> {
+    file = await file;
+
+    const nameParts = file.originalname.split(".");
+    const extension = nameParts[nameParts.length - 1];
+    const filename = v4() + "." + extension;
+
+    file.filename = "profile-pictures/" + self.email + "/" + filename;
+
+    const photoUrl = await this.storageService.uploadPublicFile(file);
+    self.avatar = photoUrl;
+    await this.userRepository.save(self);
+
+    return photoUrl + "?dummy=1234";
+  }
+
+  async deletePhoto(user: User) {
+    const avatarName = "profile-pictures/" + user.email + "/" + user.avatar.split("/").pop()
+    await this.storageService.removeFile(avatarName)
+  }
 
   async signinWithCredentials(
     email: string,

@@ -8,11 +8,14 @@ import { User } from './user.entity';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserController } from './user.controller';
+import { StorageModule } from '../storage/storage.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule,
+    StorageModule,
     JwtModule.register({
       secret: jwtConstants.secret,
     }),

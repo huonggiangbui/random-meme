@@ -6,7 +6,7 @@ export type Metadata = {
 export interface User {
   name: string;
   email: string;
-  avatarUrl?: string;
+  avatar?: string;
   memes: Meme[];
 }
 

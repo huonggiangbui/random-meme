@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Tokens } from '../types/Tokens';
 import { CreateUserDto } from './dto/create-user';
 import { SignInDto } from './dto/sign-in';
@@ -8,6 +9,8 @@ import { User } from './user.entity';
 
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user';
+import multer = require('multer');
+import path = require('path');
 
 @Controller()
 export class UserController {
@@ -50,12 +53,29 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      storage: multer.memoryStorage(),
+      limits: { fileSize: 2097152 }, // 2MB --- 2*2^20
+      fileFilter: (req, file, callback) => {
+        return file.mimetype.match(/image\/(jpg|jpeg|png|gif)$/)
+          ? callback(null, true)
+          : callback(new BadRequestException('Only image files are allowed'), false);
+      }
+    })
+  )
   @Put("user")
-  async updateProfile(@TheUser() user: User, @Body() data: UpdateUserDto) {
+  async updateProfile(@TheUser() user: User, @Body() data: UpdateUserDto, @UploadedFile() avatar: Express.Multer.File) {
     const payload: Partial<
-      Pick<User, "name" | "avatarUrl">
+      Pick<User, "name" | "password">
     > & { avatar?: any } = { ...data };
 
-    return this.userService.update(user, payload)
+    return this.userService.update(user, payload, avatar)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('user')
+  deleteUser(@TheUser() user: User) {
+    return this.userService.remove(user)
   }
 }
