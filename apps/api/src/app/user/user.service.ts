@@ -40,8 +40,6 @@ export class UserService {
   ) {}
   async create(data: CreateUserDto): Promise<Omit<User, "password" | "refresh_tokens">> {
     const newUser = this.userRepository.create(data);
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    newUser.password = hashedPassword;
     const { password, refresh_tokens, ...rest } = await this.userRepository.save(newUser);
 
     return rest;
@@ -51,10 +49,10 @@ export class UserService {
     return this.userRepository.find(options);
   }
 
-  async getProfile(email: string): Promise<Omit<User, "password" | "refresh_tokens">>{
+  async getProfile(id: string): Promise<Omit<User, "password" | "refresh_tokens">>{
     const { password, refresh_tokens, ...rest } = await createQueryBuilder(User)
       .leftJoinAndSelect("User.memes", "Meme")
-      .where("User.email = :email", { email: email })
+      .where("User.id = :id", { id: id })
       .getOne() as User;
 
     return rest;
@@ -77,12 +75,7 @@ export class UserService {
 
   async update(user: User, data: Partial<
     Pick<User, "name" | "password">
-  >, avatar: Express.Multer.File): Promise<UpdateResult | void>{
-    if (data.password) {
-      const hashedPassword = await bcrypt.hash(data.password, 10);
-      data.password = hashedPassword;
-    }
-    
+  >, avatar?: Express.Multer.File): Promise<UpdateResult | void>{    
     if (avatar) {
       if (user.avatar) {
         await this.deletePhoto(user)
@@ -90,12 +83,12 @@ export class UserService {
       await this.updatePhoto(user, avatar);
     }
 
-    return this.userRepository.update(user.email, data);
+    return this.userRepository.update(user.id, data);
   }
 
   async remove(user: User): Promise<void> {
     await this.deletePhoto(user);
-    await this.userRepository.delete(user.email);
+    await this.userRepository.delete(user.id);
   }
 
   async updatePhoto(
@@ -106,9 +99,7 @@ export class UserService {
 
     const nameParts = file.originalname.split(".");
     const extension = nameParts[nameParts.length - 1];
-    const filename = v4() + "." + extension;
-
-    file.filename = "profile-pictures/" + self.email + "/" + filename;
+    file.filename = self.id + "/avatar" + "." + extension;
 
     const photoUrl = await this.storageService.uploadPublicFile(file);
     self.avatar = photoUrl;
@@ -118,7 +109,7 @@ export class UserService {
   }
 
   async deletePhoto(user: User) {
-    const avatarName = "profile-pictures/" + user.email + "/" + user.avatar.split("/").pop()
+    const avatarName = user.id + "/avatar" + user.avatar.split("/").pop()
     await this.storageService.removeFile(avatarName)
   }
 

@@ -20,23 +20,15 @@ export default class StorageService {
     return this.storage;
   }
 
-  // public uploadPrivateFile(file: Express.Multer.File): Promise<boolean> {
-  //   return new Promise((res) => {
-  //     createReadStream(file.buffer)
-  //       .pipe(
-  //         this.storage
-  //           .bucket(this.bucket_name)
-  //           .file(file.filename)
-  //           .createWriteStream()
-  //       )
-  //       .on("finish", () => {
-  //         res(true);
-  //       })
-  //       .on("error", () => {
-  //         res(false);
-  //       });
-  //   });
-  // }
+  public async uploadPrivateFile(file: Express.Multer.File): Promise<boolean> {
+    const fileRef = this.storage.bucket(this.bucket_name).file(file.filename);
+    try {
+      await fileRef.save(file.buffer, { contentType: file.mimetype });
+      return true
+    } catch (error) {
+      throw new Error("Something went wrong while upload file!");
+    }
+  }
 
   public async uploadPublicFile(file: Express.Multer.File): Promise<string> {
     const fileRef = this.storage.bucket(this.bucket_name).file(file.filename);
@@ -60,17 +52,17 @@ export default class StorageService {
     }
   }
 
-  // public async getFileUrl(name: string): Promise<string> {
-  //   const url = (
-  //     await this.storage
-  //       .bucket(this.bucket_name)
-  //       .file(name)
-  //       .getSignedUrl({
-  //         action: "read",
-  //         expires: Number(new Date()) + 1000 * 60 * 60, // 1 hour
-  //       })
-  //   )[0];
+  public async getFileUrl(name: string): Promise<string> {
+    const url = (
+      await this.storage
+        .bucket(this.bucket_name)
+        .file(name)
+        .getSignedUrl({
+          action: "read",
+          expires: Number(new Date()) + 1000 * 60 * 60, // 1 hour
+        })
+    )[0];
 
-  //   return url;
-  // }
+    return url;
+  }
 }

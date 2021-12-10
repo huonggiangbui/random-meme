@@ -4,6 +4,7 @@ export type Metadata = {
 };
 
 export interface User {
+  id: string;
   name: string;
   email: string;
   avatar?: string;
@@ -11,8 +12,9 @@ export interface User {
 }
 
 export interface Meme {
+  id: string;
   owner: User;
-  source: string | File;
+  source: string;
   content?: string;
 
   upvotes: number;

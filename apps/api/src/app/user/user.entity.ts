@@ -5,8 +5,11 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  PrimaryGeneratedColumn,
+  BeforeInsert,
 } from 'typeorm';
 import { IsEmail } from 'class-validator';
+import * as bcrypt from 'bcrypt';
 import { User as IUser } from '@random-meme/shared-types';
 import { Report } from '../report/report.entity';
 import { Meme } from '../meme/meme.entity';
@@ -14,10 +17,13 @@ import { Comment } from '../comment/comment.entity';
 
 @Entity()
 export class User implements IUser {
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
+
   @Column()
   name: string;
 
-  @PrimaryColumn({ unique: true })
+  @Column({ unique: true })
   @IsEmail()
   email: string;
 
@@ -42,4 +48,9 @@ export class User implements IUser {
 
   @Column('text', { array: true, default: [] })
   refresh_tokens: string[];
+
+  @BeforeInsert()
+  private async hashPassword() {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
 }

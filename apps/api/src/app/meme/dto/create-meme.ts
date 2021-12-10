@@ -1,4 +1,4 @@
 export class CreateMemeDto {
-  source: string | File;
+  source: string | Express.Multer.File;
   content?: string;
 }

@@ -15,14 +15,14 @@ import { User } from '../user/user.entity';
 
 @Entity()
 export class Meme implements IMeme {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @ManyToOne(() => User, (u) => u.memes, { onDelete: "CASCADE", lazy: true })
   owner: User;
 
-  @Column('jsonb', { unique: true })
-  source!: string | File;
+  @Column('jsonb', { unique: true, nullable: true })
+  source!: string;
 
   @Column({ nullable: true })
   content?: string;

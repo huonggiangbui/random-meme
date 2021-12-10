@@ -1,4 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import multer = require('multer');
 import { JwtAuthGuard } from '../user/guards/jwt-auth.guard';
 import { TheUser } from '../user/user.decorator';
 import { User } from '../user/user.entity';
@@ -21,8 +23,22 @@ export class MemeController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('source', {
+      storage: multer.memoryStorage(),
+      limits: { fileSize: 2097152 }, // 2MB --- 2*2^20
+      fileFilter: (req, file, callback) => {
+        return file.mimetype.match(/image\/(jpg|jpeg|png|gif)$/)
+          ? callback(null, true)
+          : callback(new BadRequestException('Only image files smaller than 2MB are supported'), false);
+      }
+    })
+  )
   @Post("memes")
-  async createMeme(@TheUser() user: User, @Body() body: CreateMemeDto): Promise<void | Meme> {
+  async createMeme(@TheUser() user: User, @Body() body: CreateMemeDto, @UploadedFile() source: Express.Multer.File): Promise<void | Meme> {
+    if (source) {
+      body.source = source;
+    }
     return this.memeService.create(user, body)
   }
 

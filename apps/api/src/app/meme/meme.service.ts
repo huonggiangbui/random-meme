@@ -13,11 +13,13 @@ import {
   Repository,
   UpdateResult,
 } from 'typeorm';
+import { v4 } from "uuid";
 import { Meme } from './meme.entity';
 import { CreateMemeDto } from './dto/create-meme';
 import { User } from '../user/user.entity';
 import { getMemeFetcher, getRedditMemes } from './fetchmeme';
 import admin from '../utils/admin';
+import StorageService from '../storage/storage.service';
 
 export interface IPayload {
   email: string;
@@ -28,11 +30,23 @@ export class MemeService {
   constructor(
     @InjectRepository(Meme)
     private memeRepository: Repository<Meme>,
+    private storageService: StorageService,
     private connection: Connection
   ) { }
   async create(user: User, data: CreateMemeDto): Promise<Meme> {
-    const newMeme = this.memeRepository.create(data);
+    const newMeme = this.memeRepository.create();
     await this.memeRepository.save(newMeme);
+    if (data.content) {
+      newMeme.content = data.content;
+    }
+    if (typeof data.source != "string") {
+      await this.uploadFile(newMeme, data.source);
+    }
+    else {
+      newMeme.source = data.source;
+      await this.memeRepository.save(newMeme);
+    }
+    
 
     try {
       await this.connection
@@ -48,6 +62,25 @@ export class MemeService {
     }
   }
 
+  async uploadFile(
+    self: Meme,
+    file: Express.Multer.File
+  ): Promise<string> {
+    file = await file;
+
+    const nameParts = file.originalname.split(".");
+    const extension = nameParts[nameParts.length - 1];
+    const filename = v4() + "." + extension;
+
+    file.filename = "memes/" + self.id + "/" + filename;
+
+    const photoUrl = await this.storageService.uploadPublicFile(file);
+    self.source = photoUrl;
+    await this.memeRepository.save(self);
+
+    return photoUrl + "?dummy=1234";
+  }
+
   async readMemeFetcher(memes: Meme[]) {
     for (let i = 0; i < memes.length; i++) {
       const meme = memes[i];
@@ -58,14 +91,18 @@ export class MemeService {
     }
   }
 
+  async getPublicMemes() {
+    const memeFetcher = await getMemeFetcher() as Meme[];
+    const redditFetcher = await getRedditMemes() as Meme[];
+
+    await this.readMemeFetcher(memeFetcher)
+    await this.readMemeFetcher(redditFetcher)
+  }
+
   async getAll(options?: FindManyOptions<Meme>): Promise<Meme[]> {
     try {
-      const memeFetcher = await getMemeFetcher() as Meme[];
-      const redditFetcher = await getRedditMemes() as Meme[];
-      
-      await this.readMemeFetcher(memeFetcher)
-      await this.readMemeFetcher(redditFetcher)
-      
+      await this.getPublicMemes();
+
       const memes = await createQueryBuilder(Meme)
         .leftJoinAndSelect("Meme.owner", "User")
         .select(['Meme', 'User.name', 'User.avatar'])

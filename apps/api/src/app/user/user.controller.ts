@@ -47,9 +47,9 @@ export class UserController {
     return this.userService.disableAllRefreshTokens(user)
   }
 
-  @Get("users/:email")
+  @Get("users/:id")
   async getUserInfo(@Param() params): Promise<Omit<User, "password" | "refresh_tokens">> {
-    return this.userService.getProfile(params.email)
+    return this.userService.getProfile(params.id)
   }
 
   @UseGuards(JwtAuthGuard)
