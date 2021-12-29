@@ -41,6 +41,7 @@
     "rxjs": "^7.4.0",
     "tslib": "^2.0.0",
     "typeorm": "^0.2.38",
+    "webpack": "^5.65.0",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {

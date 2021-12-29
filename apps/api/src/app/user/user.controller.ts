@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Tokens } from '../types/Tokens';
 import { CreateUserDto } from './dto/create-user';
@@ -9,8 +9,7 @@ import { User } from './user.entity';
 
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user';
-import multer = require('multer');
-import path = require('path');
+import * as multer from 'multer';
 
 @Controller()
 export class UserController {

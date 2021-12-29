@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import multer = require('multer');
+import * as multer from 'multer';
 import { JwtAuthGuard } from '../user/guards/jwt-auth.guard';
 import { TheUser } from '../user/user.decorator';
 import { User } from '../user/user.entity';
