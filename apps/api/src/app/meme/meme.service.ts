@@ -18,8 +18,9 @@ import { Meme } from './meme.entity';
 import { CreateMemeDto } from './dto/create-meme';
 import { User } from '../user/user.entity';
 import { getMemeFetcher, getRedditMemes } from './fetchmeme';
-import admin from '../utils/admin';
+import adminConfig from '../utils/admin';
 import StorageService from '../storage/storage.service';
+import { UserService } from '../user/user.service';
 
 export interface IPayload {
   email: string;
@@ -31,6 +32,7 @@ export class MemeService {
     @InjectRepository(Meme)
     private memeRepository: Repository<Meme>,
     private storageService: StorageService,
+    private userService: UserService,
     private connection: Connection
   ) { }
   async create(user: User, data: CreateMemeDto): Promise<Meme> {
@@ -47,7 +49,6 @@ export class MemeService {
       await this.memeRepository.save(newMeme);
     }
     
-
     try {
       await this.connection
         .createQueryBuilder()
@@ -86,6 +87,7 @@ export class MemeService {
       const meme = memes[i];
       const result = await this.findBySource(JSON.stringify(meme.source))
       if (!result) {
+        const admin = await this.userService.findByEmail(adminConfig.email)
         await this.create(admin as User, meme)
       }
     }
@@ -105,7 +107,7 @@ export class MemeService {
 
       const memes = await createQueryBuilder(Meme)
         .leftJoinAndSelect("Meme.owner", "User")
-        .select(['Meme', 'User.name', 'User.avatar'])
+        .select(['Meme', 'User.id', 'User.name', 'User.avatar'])
         .getMany() as Meme[];
 
       return memes;
@@ -138,7 +140,7 @@ export class MemeService {
       const meme = await createQueryBuilder(Meme)
         .leftJoinAndSelect("Meme.owner", "User")
         .leftJoinAndSelect("Meme.comments", "Comment")
-        .select(['Meme', 'Comment', 'User.name', 'User.avatar'])
+        .select(['Meme', 'Comment', 'User.id', 'User.name', 'User.avatar'])
         .where("Meme.id = :id", { id: id })
         .getOneOrFail() as Meme;
      

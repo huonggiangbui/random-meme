@@ -1,7 +1,4 @@
-/*
-   * Remove template code below
-   */
-:host {
+/* :host {
   display: block;
   font-family: sans-serif;
   min-width: 300px;
@@ -21,7 +18,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
+} */
 
 header {
   background-color: #143055;
@@ -41,16 +38,51 @@ p {
 h1 {
   text-align: center;
   margin-left: 18px;
-  font-size: 24px;
+  font-size: 36px;
 }
 
-h2 {
+/* h2 {
   text-align: center;
   font-size: 20px;
   margin: 40px 0 10px 0;
+} */
+
+img {
+  width: -webkit-fill-available;
 }
 
-.resources {
+.btn {
+  display: block;
+  margin: auto;
+  padding: 24px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: #000;
+  background-color: #fff;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+}
+
+.btn:hover {
+  background-color: #2EE59D;
+  box-shadow: 0px 15px 20px rgba(46, 229, 157, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+}
+
+/* .resources {
   text-align: center;
   list-style: none;
   padding: 0;
@@ -130,4 +162,4 @@ summary {
   height: 16px;
   width: 16px;
   margin-right: 4px;
-}
+} */

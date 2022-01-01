@@ -10,6 +10,8 @@ import { PageNotFoundComponent } from './pagenotfound/PageNotFound.component';
 import { HttpErrorHandler } from './http-error-handler.service';
 import { MessageService } from './message.service';
 import { HomeModule } from './home/home.module';
+import { SignupComponent } from './signup/signup.component';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -18,7 +20,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, SignupComponent],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -27,7 +29,8 @@ const routes: Routes = [
       headerName: 'My-Xsrf-Header',
     }),
     RouterModule.forRoot(routes, { initialNavigation: 'enabledBlocking' }),
-    HomeModule
+    HomeModule,
+    NoopAnimationsModule
   ],
   providers: [HttpErrorHandler, MessageService],
   bootstrap: [AppComponent],

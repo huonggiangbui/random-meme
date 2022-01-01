@@ -8,6 +8,7 @@ import { catchError } from 'rxjs/operators';
 
 import { HttpErrorHandler, HandleError } from '../http-error-handler.service';
 import { Meme } from '@random-meme/shared-types';
+import { environment } from '../../environments/environment';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -18,7 +19,7 @@ const httpOptions = {
 
 @Injectable()
 export class HomeService {
-  homeUrl = `http://localhost:3333/api/memes`;
+  homeUrl = `${environment.backend_url}/api/memes`;
   private handleError: HandleError;
 
   constructor(
