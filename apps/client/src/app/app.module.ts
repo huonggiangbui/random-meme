@@ -4,14 +4,22 @@ import { HttpClientModule, HttpClientXsrfModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { Routes, RouterModule } from '@angular/router';
-import { LoginComponent } from './login/login.component';
+import { LoginComponent } from './pages/login/login.component';
 import { HomeComponent } from './home/home.component';
-import { PageNotFoundComponent } from './pagenotfound/PageNotFound.component';
+import { PageNotFoundComponent } from './pages/pagenotfound/PageNotFound.component';
 import { HttpErrorHandler } from './http-error-handler.service';
 import { MessageService } from './message.service';
 import { HomeModule } from './home/home.module';
-import { SignupComponent } from './signup/signup.component';
+import { SignupComponent } from './pages/signup/signup.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatListModule } from '@angular/material/list';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { SidenavComponent } from './components/sidenav/sidenav.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -20,7 +28,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [AppComponent, SignupComponent],
+  declarations: [AppComponent, SignupComponent, NavbarComponent, SidenavComponent],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -30,7 +38,13 @@ const routes: Routes = [
     }),
     RouterModule.forRoot(routes, { initialNavigation: 'enabledBlocking' }),
     HomeModule,
-    NoopAnimationsModule
+    FlexLayoutModule,
+    NoopAnimationsModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatButtonModule,
+    MatListModule
   ],
   providers: [HttpErrorHandler, MessageService],
   bootstrap: [AppComponent],

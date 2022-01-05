@@ -41,3 +41,4 @@ Thumbs.db
 apps/api/.env
 /apps/api/src/app/config/service-account.json
 /apps/api/src/app/utils/admin.ts
+/apps/client/src/environments/environment.ts

@@ -3,13 +3,14 @@
   <a mat-icon-button routerLink="/users/{{defaultMeme.__owner__.id}}" *ngIf="defaultMeme.__owner__">
     <span class="avatar">
       <!-- <mat-icon *ngIf="!defaultMeme.__owner__.avatar">account_circle</mat-icon> -->
-      <div mat-card-avatar *ngIf="defaultMeme.__owner__.avatar" style="background-image: url({{defaultMeme.__owner__.avatar}}); background-size: cover; border-radius: 50%; width: 48px; height: 48px;">
+      <div mat-card-avatar *ngIf="defaultMeme.__owner__.avatar"
+        style="background-image: url({{defaultMeme.__owner__.avatar}});">
       </div>
       <mat-card-title style="padding: 16px">{{defaultMeme.__owner__.name}}</mat-card-title>
     </span>
   </a>
   <a routerLink="/memes/{{defaultMeme.id}}">
-    <img src={{defaultMeme.source}} alt={{defaultMeme.content}} style="margin-top: 16px" />
+    <img src={{defaultMeme.source}} alt={{defaultMeme.content}} />
   </a>
   <p>{{defaultMeme.content}}</p>
   <button class="btn"(click)="randomizeMemes()">Randomize a meme</button>

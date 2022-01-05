@@ -1,9 +1,11 @@
-<main>
-  <nav>
-    <ul>
-      <li><a routerLink="/login" routerLinkActive="active">Login</a></li>
-    </ul>
-  </nav>
-</main>
-
-<router-outlet></router-outlet>
+<mat-sidenav-container>
+  <mat-sidenav #sidenav role="navigation">
+    <random-meme-sidenav (sidenavClose)="sidenav.close()"></random-meme-sidenav>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <random-meme-navbar (sidenavToggle)="sidenav.toggle()"></random-meme-navbar>
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>
